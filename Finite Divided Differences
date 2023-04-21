@@ -1,0 +1,55 @@
+! finite_divided_differences.f90
+program finite_divided_differences
+    implicit none
+    integer :: n, i, j, k
+    real :: x, f, h
+    real, allocatable, dimension(:) :: array, array_2
+    real, allocatable, dimension(:,:) :: D
+
+    ! Input the number of data points
+    write (*,*) "Enter the number of data points:"
+    read (*,*) n
+
+    ! Allocate memory for the data points and finite differences table
+    allocate(array(n), array_2(n), D(n, n))
+
+    ! Input the data points (X, F)
+    write (*,*) "Enter the data points (X, F) separated by spaces:"
+    do i = 1, n
+        read (*,*) array(i), array_2(i)
+    end do
+
+    ! Compute the finite differences table
+    D(:, 1) = array_2
+    do j = 2, n
+        do i = 1, n - j + 1
+            D(i, j) = D(i + 1, j - 1) - D(i, j - 1)
+        end do
+    end do
+
+    ! Display the finite differences table
+    write (*,*) "Finite differences table:"
+    do i = 1, n
+        write (*, '(F6.2, 2X)', advance='no') array(i)
+        do j = 1, n - i + 1
+            write (*, '(F6.2, 2X)', advance='no') D(i, j)
+        end do
+        write (*,*)
+    end do
+
+    ! Input the x value for interpolation
+    write (*,*) "Enter the x value for interpolation:"
+    read (*,*) x
+
+    ! Compute the interpolated value using Newton's divided differences formula
+    f = D(1, 1)
+    h = x - array(1)
+    do i = 2, n
+        f = f + h * D(1, i)
+        h = h * (x - array(i))
+    end do
+
+    ! Display the interpolated value
+    write (*,*) "Interpolated value at x =", x, "is f =", f
+
+end program finite_divided_differences
