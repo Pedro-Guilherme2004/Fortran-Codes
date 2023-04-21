@@ -1,0 +1,42 @@
+! neville_aitken_interpolation.f90
+program neville_aitken_interpolation
+    implicit none
+    integer :: n, i, j, x
+    real :: y_neville
+    real, allocatable, dimension(:) :: array, array_2
+    real, allocatable, dimension(:,:) :: P
+
+    ! Input the number of data points
+    write (*,*) "Enter the number of data points:"
+    read (*,*) n
+
+    ! Allocate memory for the data points and interpolation table
+    allocate(array(n), array_2(n), P(n, n))
+
+    ! Input the data points (X, Y)
+    write (*,*) "Enter the data points (X, Y) separated by spaces:"
+    do i = 1, n
+        read (*,*) array(i), array_2(i)
+    end do
+
+    ! Initialize the interpolation table with Y values
+    P(:, 1) = array_2
+
+    ! Input the x value for interpolation
+    write (*,*) "Enter the x value for interpolation:"
+    read (*,*) x
+
+    ! Compute the interpolated value using Neville's method (Aitken's algorithm)
+    do j = 2, n
+        do i = 1, n - j + 1
+            P(i, j) = ((x - array(i)) * P(i + 1, j - 1) - (x - array(i + j - 1)) * P(i, j - 1)) / (array(i + j - 1) - array(i))
+        end do
+    end do
+
+    ! Obtain the final interpolated value
+    y_neville = P(1, n)
+
+    ! Display the interpolated value
+    write (*,*) "Interpolated value using Neville's method (Aitken's algorithm) at x =", x, "is y =", y_neville
+
+end program neville_aitken_interpolation
