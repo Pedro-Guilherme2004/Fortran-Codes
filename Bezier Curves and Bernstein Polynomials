@@ -1,0 +1,41 @@
+! bezier_curves_bernstein_polynomials.f90
+program bezier_curves_bernstein_polynomials
+    implicit none
+    integer, parameter :: num_points = 100
+    integer :: i
+    real :: t
+    real, dimension(2) :: p0, p1, p2, b
+
+    ! Input control points P0, P1, and P2
+    write (*,*) "Enter the control points P0 (x, y):"
+    read (*,*) p0
+    write (*,*) "Enter the control points P1 (x, y):"
+    read (*,*) p1
+    write (*,*) "Enter the control points P2 (x, y):"
+    read (*,*) p2
+
+    ! Calculate and output points on the Bezier curve
+    write (*,*) "Bezier curve points:"
+    do i = 0, num_points
+        t = real(i) / real(num_points)
+        b = bezier_point(t, p0, p1, p2)
+        write (*, '(2F10.5)') b
+    end do
+
+contains
+
+    ! Calculate a point on the quadratic Bezier curve using Bernstein polynomials
+    function bezier_point(t, p0, p1, p2) result(b)
+        real, intent(in) :: t
+        real, intent(in) :: p0(2), p1(2), p2(2)
+        real :: b(2)
+        real :: b0, b1, b2
+
+        b0 = (1.0 - t)**2
+        b1 = 2.0 * t * (1.0 - t)
+        b2 = t**2
+
+        b = b0 * p0 + b1 * p1 + b2 * p2
+    end function bezier_point
+
+end program bezier_curves_bernstein_polynomials
