@@ -1,0 +1,57 @@
+! b_spline_interpolation.f90
+program b_spline_interpolation
+    implicit none
+    integer :: n, i
+    real, allocatable, dimension(:) :: x, y, t, b
+    real :: query_x, query_y
+
+    ! Input the number of data points
+    write (*,*) "Enter the number of data points:"
+    read (*,*) n
+
+    ! Allocate memory for the data points and knot vector
+    allocate(x(n), y(n), t(n+2), b(n))
+
+    ! Input the data points (X, Y)
+    write (*,*) "Enter the data points (X, Y) separated by spaces:"
+    do i = 1, n
+        read (*,*) x(i), y(i)
+    end do
+
+    ! Construct the knot vector
+    t(1) = x(1)
+    t(n+2) = x(n)
+    do i = 2, n + 1
+        t(i) = 0.5 * (x(i-1) + x(i))
+    end do
+
+    ! Input x value to interpolate
+    write (*,*) "Enter the x value for interpolation:"
+    read (*,*) query_x
+
+    ! Interpolate y value for the query_x
+    call interpolate_y(n, x, y, t, query_x, query_y)
+
+    ! Output the interpolated y value
+    write (*,*) "Interpolated y value at x =", query_x, "is y =", query_y
+
+contains
+
+    ! Interpolate the y value for a given x value using linear B-spline basis functions
+    subroutine interpolate_y(n, x, y, t, query_x, query_y)
+        integer, intent(in) :: n
+        real, intent(in) :: x(n), y(n), t(n+2), query_x
+        real, intent(out) :: query_y
+        integer :: i
+        real :: u
+
+        query_y = 0.0
+        do i = 1, n
+            u = (query_x - t(i)) / (t(i+1) - t(i))
+            if (u >= 0.0 .and. u <= 1.0) then
+                query_y = query_y + u * y(i)
+            end if
+        end do
+    end subroutine interpolate_y
+
+end program b_spline_interpolation
