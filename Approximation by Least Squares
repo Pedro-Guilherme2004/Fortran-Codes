@@ -1,0 +1,38 @@
+! least_squares_approximation.f90
+program least_squares_approximation
+    implicit none
+    integer :: n, i
+    real :: sum_x, sum_y, sum_xy, sum_x2, a, b
+    real, allocatable, dimension(:) :: x, y
+
+    ! Input the number of data points
+    write (*,*) "Enter the number of data points:"
+    read (*,*) n
+
+    ! Allocate memory for the data points
+    allocate(x(n), y(n))
+
+    ! Input the data points (X, Y)
+    write (*,*) "Enter the data points (X, Y) separated by spaces:"
+    do i = 1, n
+        read (*,*) x(i), y(i)
+    end do
+
+    ! Calculate the sums needed for the least squares approximation
+    sum_x = sum(x)
+    sum_y = sum(y)
+    sum_xy = sum(x * y)
+    sum_x2 = sum(x**2)
+
+    ! Compute the coefficients a and b
+    a = (n * sum_xy - sum_x * sum_y) / (n * sum_x2 - sum_x**2)
+    b = (sum_y - a * sum_x) / n
+
+    ! Output the resulting linear equation
+    write (*,*) "Least squares approximation:"
+    write (*, '(A, F10.5, A, F10.5, A)') "y = ", a, "x + ", b
+
+    ! Deallocate memory
+    deallocate(x, y)
+
+end program least_squares_approximation
