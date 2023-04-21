@@ -1,0 +1,64 @@
+! newton_lagrange_interpolation.f90
+program newton_lagrange_interpolation
+    implicit none
+    integer :: n, i, j, x
+    real ::  y_newton, y_lagrange
+    real, allocatable, dimension(:) :: array, array_2
+    real, allocatable, dimension(:,:) :: D
+
+    ! Input the number of data points
+    write (*,*) "Enter the number of data points:"
+    read (*,*) n
+
+    ! Allocate memory for the data points and divided differences table
+    allocate(array(n), array_2(n), D(n, n))
+
+    ! Input the data points (X, Y)
+    write (*,*) "Enter the data points (X, Y) separated by spaces:"
+    do i = 1, n
+        read (*,*) array(i), array_2(i)
+    end do
+
+    ! Compute the divided differences table
+    D(:, 1) = array_2
+    do j = 2, n
+        do i = 1, n - j + 1
+            D(i, j) = (D(i + 1, j - 1) - D(i, j - 1)) / (array(i + j - 1) - array(i))
+        end do
+    end do
+
+    ! Input the x value for interpolation
+    write (*,*) "Enter the x value for interpolation:"
+    read (*,*) x
+
+    ! Compute the interpolated value using Newton's interpolation formula
+    y_newton = array_2(1)
+    do i = 2, n
+        y_newton = y_newton + product(x - array(1:i-1)) * D(1, i)
+    end do
+
+    ! Compute the interpolated value using Lagrange's interpolation formula
+    y_lagrange = 0.0
+    do i = 1, n
+        y_lagrange = y_lagrange + array_2(i) * product((x - array)/((array(i) - array) + merge(1.0, 0.0, array == array(i))))
+    end do
+
+    ! Display the interpolated values
+    write (*,*) "Interpolated value using Newton's formula at x =", x, "is y =", y_newton
+    write (*,*) "Interpolated value using Lagrange's formula at x =", x, "is y =", y_lagrange
+
+contains
+
+    ! Compute the product of an array of real numbers
+    function product(a) result(p)
+        real, intent(in) :: a(:)
+        real :: p
+        integer :: i
+
+        p = 1.0
+        do i = 1, size(a)
+            p = p * a(i)
+        end do
+    end function product
+
+end program newton_lagrange_interpolation
