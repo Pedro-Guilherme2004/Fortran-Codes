@@ -1,0 +1,42 @@
+! bernstein_polynomials.f90
+program bernstein_polynomials
+    implicit none
+    integer, parameter :: n_points = 100
+    integer :: i, j, degree
+    real :: t, binom_coeff, value
+    real, allocatable, dimension(:,:) :: B
+
+    ! Input degree of the Bernstein polynomials
+    write (*,*) "Enter the degree of Bernstein polynomials:"
+    read (*,*) degree
+
+    ! Allocate memory for the Bernstein basis polynomials
+    allocate(B(degree+1, n_points))
+
+    ! Compute and display the Bernstein basis polynomials
+    write (*,*) "Bernstein basis polynomials for degree", degree
+    do i = 0, degree
+        do j = 0, n_points - 1
+            t = real(j) / real(n_points - 1)
+            binom_coeff = real(combination(degree, i))
+            value = binom_coeff * t**i * (1.0 - t)**(degree - i)
+            B(i+1, j+1) = value
+            write (*, '(A, I2, A, F6.3, A, F8.5)') "B(", i, ", ", t, ") =", value
+        end do
+    end do
+
+contains
+
+    ! Compute the binomial coefficient (n choose k) using a recursive function
+    recursive function combination(n, k) result(binom_coeff)
+        integer, intent(in) :: n, k
+        integer :: binom_coeff
+
+        if (k == 0 .or. k == n) then
+            binom_coeff = 1
+        else
+            binom_coeff = combination(n - 1, k - 1) + combination(n - 1, k)
+        endif
+    end function combination
+
+end program bernstein_polynomials
